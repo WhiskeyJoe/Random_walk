@@ -1,0 +1,20 @@
+'''
+
+1 function to keep it simple
+
+Directions : [North, South, East, West]
+Units : [0, 2, sqrt(2)]
+north = (0, +50)
+south = (0, -50)
+east = (+50, 0)
+west = (-50, 0)
+
+start point = 0,0
+
+dictionary for ma, pa, reg
+must be clockwise (norht, east, south, west)
+
+
+if name = Pa Pa, 
+	pick random from Direction (any)
+	pick random from unit (0, 2, sqrt(2), Sqrt(2))
