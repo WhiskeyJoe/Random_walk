@@ -1,20 +1,71 @@
-'''
-
-1 function to keep it simple
-
-Directions : [North, South, East, West]
-Units : [0, 2, sqrt(2)]
-north = (0, +50)
-south = (0, -50)
-east = (+50, 0)
-west = (-50, 0)
-
-start point = 0,0
-
-dictionary for ma, pa, reg
-must be clockwise (norht, east, south, west)
+import random
+import math
+import sys
 
 
-if name = Pa Pa, 
-	pick random from Direction (any)
-	pick random from unit (0, 2, sqrt(2), Sqrt(2))
+def simulate_walk(walk_length, walker):
+    x, y = 0, 0
+    units = 0, 2, math.sqrt(2), math.sqrt(2)
+    for steps in range(walk_length):
+        if walker == 'Pa' or walker == 'All':
+            direction = random.choice(['N', 'E', 'S', 'W'])
+        elif walker == 'Mi-Ma' or walker == 'All':
+            direction = random.choices(['N', 'E', 'S', 'S', 'W'])
+        elif walker == 'Reg' or walker == 'All':
+            direction = random.choice(['E', 'W'])
+
+        if direction == 'N':
+            y += random.choice(units)
+        elif direction == 'S':
+            y -= random.choice(units)
+        elif direction == 'E':
+            x += random.choice(units)
+        else:  # direction == 'W'
+            x -= random.choice(units)
+
+    return math.sqrt(x ** 2 + y ** 2)
+
+
+def simulate(walk_lengths, num_trials, walker):
+    results = []
+    if walker == "all":
+        results.extend(simulate(walk_lengths, num_trials, "Pa"))
+        results.extend(simulate(walk_lengths, num_trials, "Mi-Ma"))
+        results.extend(simulate(walk_lengths, num_trials, "Reg"))
+    else:
+        for walk_length in walk_lengths:
+            distances = []
+            for trail in range(num_trials):
+                distance = simulate_walk(walk_length, walker)
+                distances.append(distance)
+
+            mean = round(sum(distances) / num_trials, 1)
+            max_distance = round(max(distances), 1)
+            min_distance = round(min(distances), 1)
+            std_dev = math.sqrt(sum((d - mean) ** 2 for d in distances) / num_trials)
+            cv = round(std_dev / mean, 1)
+
+            print(f"{walker} random walk of {walk_length} steps")
+            print(f"Mean = {mean} CV = {cv}")
+            print(f"Max = {max_distance} Min = {min_distance}")
+            results.append((walker, walk_length, mean, cv, max_distance, min_distance))
+        print()
+    return results
+
+
+def main():
+    if len(sys.argv) != 4:
+        print("Usage: python3 main.py <walk_lengths> <num_trials> <walker>")
+        print("Example: python3 main.py 100,1000 50 all")
+        sys.exit(1)
+
+    walk_lengths_str = sys.argv[1]
+    num_trials = int(sys.argv[2])
+    walker = sys.argv[3]
+
+    walk_lengths = [int(length) for length in walk_lengths_str.split(',')]
+    simulate(walk_lengths, num_trials, walker)
+
+
+if __name__ == "__main__":
+    main()
